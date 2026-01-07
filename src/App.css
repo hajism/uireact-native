@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Full height layout */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Gradient background */
+.gradient-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Glass card effect (NO @apply for Tailwind v4 compatibility) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-radius: 1rem;
+}
