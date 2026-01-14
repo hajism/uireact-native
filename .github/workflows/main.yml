@@ -31,8 +31,9 @@ jobs:
         env:
           VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
         run: |
-          export APP_URL=$(vault kv get -field=APP_URL secret/app/development/database_config)
+          export APP_URL=$(vault kv get -field=APP_URL secret/app/development/database_config
           export API_ENDPOINT=$(vault kv get -field=API_ENDPOINT secret/app/development/database_config)
           envsubst < .env.tpl > .env
           cp .env app.yaml
+          cat app.yaml
           chmod 600 app.yaml
