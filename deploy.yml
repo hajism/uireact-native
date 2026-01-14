@@ -1,0 +1,38 @@
+name: Deploy with Vault AppRole
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vault CLI
+        run: |
+          curl -fsSL https://releases.hashicorp.com/vault/1.15.5/vault_1.15.5_linux_amd64.zip -o vault.zip
+          unzip vault.zip
+          sudo mv vault /usr/local/bin/
+
+      - name: Vault Login (AppRole)
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
+          SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
+        run: |
+          vault write auth/approle/login \
+            role_id="$ROLE_ID" \
+            secret_id="$SECRET_ID"
+
+      - name: Render YAML from Vault
+        env:
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+        run: |
+          export DB_USER=$(vault kv get -field=APP_URL secret/app)
+          export DB_PASS=$(vault kv get -field=API_ENDPOINT secret/app)
+
+          envsubst < app.yaml.tpl > app.yaml
+          chmod 600 app.yaml
