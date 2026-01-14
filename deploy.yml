@@ -33,6 +33,6 @@ jobs:
         run: |
           export DB_USER=$(vault kv get -field=APP_URL secret/app)
           export DB_PASS=$(vault kv get -field=API_ENDPOINT secret/app)
-
-          envsubst < app.yaml.tpl > app.yaml
+          envsubst < .env.tpl > .env
+          cp .env app.yaml
           chmod 600 app.yaml
