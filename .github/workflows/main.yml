@@ -17,15 +17,17 @@ jobs:
           unzip vault.zip
           sudo mv vault /usr/local/bin/
 
-      - name: Vault Login (AppRole)
-        env:
-          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
-          ROLE_ID: ${{ secrets.VAULT_ROLE_ID }}
-          SECRET_ID: ${{ secrets.VAULT_SECRET_ID }}
+      - name: Login to Vault using AppRole
+        id: vault-login
         run: |
-          vault write auth/approle/login \
-            role_id="$ROLE_ID" \
-            secret_id="$SECRET_ID"
+          TOKEN=$(curl -s \
+            --request POST \
+            --data '{"role_id":"${{ secrets.VAULT_ROLE_ID }}","secret_id":"${{ secrets.VAULT_SECRET_ID }}"}' \
+            ${{ secrets.VAULT_ADDR }}/v1/auth/approle/login \
+            | jq -r .auth.client_token)
+
+          echo "VAULT_TOKEN=$TOKEN" >> $GITHUB_ENV
+          echo "VAULT_ADDR=${{ secrets.VAULT_ADDR }}" >> $GITHUB_ENV
 
       - name: Render YAML from Vault
         env:
